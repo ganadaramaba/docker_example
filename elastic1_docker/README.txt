@@ -1,0 +1,1 @@
+elasticsearch 이미지로 컨테이너 생성

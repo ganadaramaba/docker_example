@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  scroll:
+    image: scroll_server
+    container_name: scroll
+
+    environment:
+      - TZ=Asia/Seoul
+
+    ports:
+      - 3000:3000
+    
+    # volumes:
+    #   - /home/ubuntu/scroll/scroll_stageus:/root/project
+    
+    # entrypoint: node /root/project/server.js
+
+  postgres:
+    image: postgres:12.10
+    container_name: postgres
+
+    environment:
+      - POSTGRES_PASSWORD=11111
+      - TZ=Asia/Seoul
+      - --device=/dev/fuse
+      - --cap-add=SYS_ADMIN
+      - --security-opt=apparmor:unconfined
+    
+    volumes:
+      - /home/ubuntu/docker_sample/scroll_docker/testData:/var/lib/postgresql/data
+
+    ports:
+      - 5432:5432
+
+    expose:
+      - "5432"
+
+  elastic:
+    image: elasticsearch:7.17.2
+    container_name: elastic
+
+    environment:
+      - node.name=elastic
+      - cluster.name=indocker
+      - discovery.type=single-node
+      - TZ=Asia/Seoul
+      - bootstrap.memory_lock=true
+    
+    volumes:
+      - /home/ubuntu/docker_sample/scroll_docker/testData:/usr/share/elasticsearch/data
+
+    ports:
+      - 9200:9200
+
+    expose:
+      - "9200"
+      - "9300"
+
+      # 환경변수들
+      # 자바 메모리? 메모리 힙사이즈 지정 / -Xmx : 최대값, -Xms : 최소값
+      # heap 사이즈가 커지면 캐싱에 유리하지만 성능 저하
+      # - ES_JAVA_OPTS: "-Xmx1024m -Xms1024m"
+
+      # Logsstash의 메모리 할당 / logstash는 데이터 수집, 전환, 전송하는 서버측 데이터 처리 파이프라인
+      # - LS_JAVA_OPTS: "-Xmx1024m -Xms1024m"
+
+      # discovery : 원격에 있는 노드들을 찾아 하나의 클러스터로 바인딩하는 과정
+      # 디스커버리 설정, 클러스터를 구성할 노드에 대한 정의
+      # - discovery.seed_hosts: es02,es03
+
+      # 마스터로 선출될 후보 노드 초기 세팅(node.name)
+      # - cluster.initial_master_nodes: es01,es02,es03
+
+      # 엘라스틱이 사용할 메모리 Lock
+      # elasticsearch가 사용중인 힙 메모리 영역을 다른 자바 프로그램이 간섭 못하도록 미리 점유하는 설정
+      # - bootstrap.memory_lock: true
+
+      # 노드별로 속성을 부여하기 위한 일종의 네임스페이스를 지정
+      # - node.attr.<key>: "<value>"
+
+      # ES가 실행되는 서버의 ip 주소 / default : 127.0.0.1
+      # 내/외부 주소를 모두 지정 따로 지정하고 싶으면 아래를 이용
+      # network.bind_host : 내부망
+      # network.publish_host: 외부망
+      # - network.host: <ip주소>
+
+      # 마스터 후보 노드 여부를 결정. false인 경우 마스터 노드 선출 불가능
+      # 클러스터마다 1개의 마스터 노드 존재함. 마스터 노드 다운되면 마스터 후보 노드들에서 새 마스터 노드 선출
+      # - node.master: true
+
+    # ulimits - user limits
