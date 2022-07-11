@@ -3,3 +3,5 @@
 /scroll_docker/testData/
 
 /ubuntu_docker/.s3fs-creds
+/scroll_docker/
+/mongo_docker/mongo/data/

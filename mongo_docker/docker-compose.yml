@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  server:
+    build: ./node_docker
+    container_name: main_server
+
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+
+    environment:
+      - TZ=Asia/Seoul
+
+  mongo:
+    image: mongo:4.4.15
+    container_name: mongo_server
+
+    ports:
+      - 27017:27017
+    expose:
+      - 27017
+
+    environment:
+      - TZ=Asia/Seoul
+
+      # 관리자 계정 설정
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+
+    volumes:
+      # 설정 파일 바꾸는 법
+      - ./mongo/config/mongod.conf:/etc/mongod.conf:ro
+      # - host:container:mode
+      # ro는 read only 모드
+
+      # 데이터 저장위치 추정되는 두 곳
+      # - ./mongo/data/datapath:/var/lib/mongodb
+      - ./mongo/data/stack:/data/db
+      # /data/db 에 데이터 저장됨.

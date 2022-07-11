@@ -1,18 +1,46 @@
 version: '3.8'
 
 services:
-  es-master-1:
+  es01:
     image: elasticsearch:7.17.4
-    container_name: es-master-1
+    container_name: es01
 
     environment:
       - TZ=Asia/Seoul
-      - cluster.name=es-cluster-1
-      - node.name=es-master-1
-      - discovery.seed_hosts=es-master-1, es-data-1
-      - cluster.initial_master_nodes=es-master-1
+      - cluster.name=es-cluster
+      - node.name=es01
+      - node.roles=master, data
+
+      # 클러스터를 구성할 노드의 리스트? 본인은 제외되도 되나? 되는듯
+      - discovery.seed_hosts=es02
+
+      # 마스터노드 후보 노드의 주소
+      - cluster.initial_master_nodes=es01
+
       - bootstrap.memory_lock=false
       - ES_JAVA_OPTS=-Xms256m -Xmx256m
+
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+
+      # trial은 라이센스 한 달 체험판. basic은 디폴트.
+      # 한 번 trial로 설정하니 basic으로 다시 바뀌지 않음.
+      # - xpack.license.self_generated.type=trial
+      # - xpack.license.self_generated.type=basic
+      # 라이센스 삭제하는 API가 있음. 삭제하니 basic으로 바뀜
+      # 어떤 기능이 제한되는지 모름
+
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=$CERTS_DIR/es01/es01.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es01/es01.crt
+      - xpack.security.http.ssl.verification_mode=certificate 
+
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es01/es01.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es01/es01.key
 
     ports:
       - 9200:9200
@@ -23,31 +51,51 @@ services:
     volumes:
       - ./es-master-1/data:/usr/share/elasticsearch/data/nodes/0
       - ./es-master-1/logs:/usr/share/elasticsearch/logs
+      - ./security/certs:$CERTS_DIR
 
-  es-data-1:
+  es02:
     image: elasticsearch:7.17.4
-    container_name: es-data-1
+    container_name: es02
 
     environment:
       - TZ=Asia/Seoul
-      - cluster.name=es-cluster-1
-      - node.name=es-data-1
-      - node.master=false
-      - node.data=true
-      - discovery.seed_hosts=es-master-1, es-data-1
-      - cluster.initial_master_nodes=es-master-1
+      - cluster.name=es-cluster
+      - node.name=es02
+      - node.roles=data
+
+      - discovery.seed_hosts=es01
+      - cluster.initial_master_nodes=es01
+
       - bootstrap.memory_lock=false
       - ES_JAVA_OPTS=-Xms256m -Xmx256m
+
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+      # - xpack.license.self_generated.type=trial
+      # - xpack.license.self_generated.type=basic
+
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=$CERTS_DIR/es02/es02.key
+      - xpack.security.http.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.http.ssl.certificate=$CERTS_DIR/es02/es02.crt
+
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate 
+      - xpack.security.transport.ssl.certificate_authorities=$CERTS_DIR/ca/ca.crt
+      - xpack.security.transport.ssl.certificate=$CERTS_DIR/es02/es02.crt
+      - xpack.security.transport.ssl.key=$CERTS_DIR/es02/es02.key
 
     ports:
       - 9201:9201
 
     expose:
       - "9301"
+      # - "9201"
 
     volumes:
       - ./es-data-1/data:/usr/share/elasticsearch/data/nodes/0
       - ./es-data-1/logs:/usr/share/elasticsearch/logs
+      - ./security/certs:$CERTS_DIR
 
     depends_on:
-      - es-master-1
+      - es01
