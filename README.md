@@ -8,4 +8,4 @@
     docker-compose에서 mongodb 설정
 
  - ubuntu_docker
-    postgresql을 위한 Dockerfile 설정
+    ubuntu에 postgresql 설치하는 Dockerfile 설정

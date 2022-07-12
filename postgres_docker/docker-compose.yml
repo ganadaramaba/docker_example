@@ -1,0 +1,50 @@
+
+version: '3.8'
+
+services:
+  server:
+    build: ./node_server
+    container_name: main_server
+
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+
+    environment:
+      - TZ=Asia/Seoul
+
+    volumes:
+      - ./node_server/server:/usr/src/app
+    
+  postgres:
+    image: postgres:14
+    container_name: postgres_server
+
+    ports:
+      - 1234:5432
+    expose:
+      - 1234
+
+    # https://hub.docker.com/_/postgres?tab=description
+    environment:
+      - TZ=Asia/Seoul
+      - POSTGRES_PASSWORD=11111
+      # - POSTGRES_USER=username
+
+      # 데이터 저장 기본 위치는 /var/lib/postgresql/data
+      # 환경변수 PGDATA로 변경 가능
+      # - PGDATA=/var/lib/postgresql/data/mydata
+
+    volumes:
+      # 설정 변경 방법
+      # docker run을 실행할 때 설정 변경 방법(-c 사용)
+      # docker run -d --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword postgres -c shared_buffers=256MB -c max_connections=200
+      # 이미지 이름 postgres 이후 -c 옵션으로 설정파일의 내용을 변경할 수도 있음.
+      # 설정 파일을 변경할 수 도 있음.
+      # 설정 파일의 위치는 /usr/share/postgresql/postgresql.conf.sample
+      # 설정 파일 가져오는 명령어
+      # docker run -i --rm postgres cat /usr/share/postgresql/postgresql.conf.sample > postgres.conf
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      # 원래 .conf 파일은 어디있지?
+      # 일단 실행 후 찾아볼 것. 테스트를 위해 .conf 파일 만들고 마운트해서 이걸 설정 파일로 만들어 볼 것
