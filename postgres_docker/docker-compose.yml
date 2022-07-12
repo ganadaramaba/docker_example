@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
   server:
-    build: ./node_server
+    image: node:14.19
     container_name: main_server
 
     ports:
@@ -15,7 +15,11 @@ services:
       - TZ=Asia/Seoul
 
     volumes:
-      - ./node_server/server:/usr/src/app
+      - ./server:/usr/src/app
+
+    working_dir: /usr/src/app
+
+    entrypoint: node server.js
     
   postgres:
     image: postgres:14
@@ -34,7 +38,7 @@ services:
 
       # 데이터 저장 기본 위치는 /var/lib/postgresql/data
       # 환경변수 PGDATA로 변경 가능
-      # - PGDATA=/var/lib/postgresql/data/mydata
+      - PGDATA=/var/lib/postgresql/data/mydata
 
     volumes:
       # 설정 변경 방법
@@ -45,6 +49,9 @@ services:
       # 설정 파일의 위치는 /usr/share/postgresql/postgresql.conf.sample
       # 설정 파일 가져오는 명령어
       # docker run -i --rm postgres cat /usr/share/postgresql/postgresql.conf.sample > postgres.conf
-      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+      # - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
       # 원래 .conf 파일은 어디있지?
-      # 일단 실행 후 찾아볼 것. 테스트를 위해 .conf 파일 만들고 마운트해서 이걸 설정 파일로 만들어 볼 것
+      # PGDATA 디렉토리 내부에 있는 postgresql.conf 파일이 기본 설정 파일로 지정되어 있음.
+      # 설정 파일은 딱히 바꾸지 않아도 될듯.
+
+      - ./postgres/data:/var/lib/postgresql/data/mydata

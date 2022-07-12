@@ -1,7 +1,12 @@
 
 /scroll_docker/trash/
 /scroll_docker/testData/
+/scroll_docker/
 
 /ubuntu_docker/.s3fs-creds
-/scroll_docker/
+
+/mongo_docker/server/node_modules/
 /mongo_docker/mongo/data/
+
+/postgres_docker/server/node_modules/
+/postgres_docker/postgres/data/
