@@ -1,0 +1,11 @@
+
+version: '3.8'
+
+service:
+  server:
+    image: node:14.19
+    container_name: main_server
+
+  redis:
+    image: redis:7.0
+    container_name: redis_server

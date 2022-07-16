@@ -26,15 +26,14 @@ services:
     container_name: postgres_server
 
     ports:
-      - 1234:5432
+      - 2342:5432
     expose:
-      - 1234
+      - 2342
 
     # https://hub.docker.com/_/postgres?tab=description
     environment:
       - TZ=Asia/Seoul
       - POSTGRES_PASSWORD=11111
-      # - POSTGRES_USER=username
 
       # 데이터 저장 기본 위치는 /var/lib/postgresql/data
       # 환경변수 PGDATA로 변경 가능
@@ -45,9 +44,9 @@ services:
       # docker run을 실행할 때 설정 변경 방법(-c 사용)
       # docker run -d --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword postgres -c shared_buffers=256MB -c max_connections=200
       # 이미지 이름 postgres 이후 -c 옵션으로 설정파일의 내용을 변경할 수도 있음.
-      # 설정 파일을 변경할 수 도 있음.
-      # 설정 파일의 위치는 /usr/share/postgresql/postgresql.conf.sample
-      # 설정 파일 가져오는 명령어
+      # 설정 파일을 변경할 수도 있음.
+      # 설정 파일 샘플의 위치는 /usr/share/postgresql/postgresql.conf.sample
+      # 설정 파일 샘플 가져오는 명령어
       # docker run -i --rm postgres cat /usr/share/postgresql/postgresql.conf.sample > postgres.conf
       # - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
       # 원래 .conf 파일은 어디있지?
@@ -55,3 +54,4 @@ services:
       # 설정 파일은 딱히 바꾸지 않아도 될듯.
 
       - ./postgres/data:/var/lib/postgresql/data/mydata
+      - ./postgres/init-user-db.sh:/docker-entrypoint-initdb.d/init-user-db.sh

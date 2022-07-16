@@ -9,4 +9,5 @@
 /mongo_docker/mongo/data/
 
 /postgres_docker/server/node_modules/
+/postgres_docker/server/private/
 /postgres_docker/postgres/data/
