@@ -11,3 +11,8 @@
 /postgres_docker/server/node_modules/
 /postgres_docker/server/private/
 /postgres_docker/postgres/data/
+
+/redis_docker/server/node_modules/
+/redis_docker/server/private/
+/redis_docker/redis/data/
+/redis_docker/redis/log/

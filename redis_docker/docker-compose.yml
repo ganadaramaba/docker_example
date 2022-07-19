@@ -1,11 +1,49 @@
 
 version: '3.8'
 
-service:
+services:
   server:
     image: node:14.19
     container_name: main_server
 
+    ports:
+      - 8080:8080
+    expose:
+      - 8080
+
+    environment:
+      - TZ=Asia/Seoul
+
+    volumes:
+      - ./server:/usr/src/app
+
+    working_dir: /usr/src/app
+
+    entrypoint: node server.js
+
   redis:
-    image: redis:7.0
+    image: redis:5.0
     container_name: redis_server
+
+    # ports:
+    #   - 4242:6379
+    # expose:
+    #   - 6379
+    # 둘 다 주석처리해도 데이터 전송 됨. 뭐지?
+
+    environment:
+      - TZ=Asia/Seoul
+
+    volumes:
+      - ./redis/data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis/log:/var/log/redis
+    
+    command: redis-server /usr/local/etc/redis/redis.conf
+    # docker-compose 실행하면 바로 종료되는 문제가 있음
+    # 위 command를 주석처리하면 제대로 실행됨.
+    # redis.conf 파일에 설정이 'daemonize yes'로 설정되어 있어서
+    # 백그라운드로 실행되고 컨테이너가 바로 닫혔던게 문제였음
+    # 포그라운드(foreground)로 실행되어야 컨테이너가 유지됨.
+    # 설정 파일의 설정을 'daemonize no'로 바꿔서 해결함.
+    
